@@ -41,33 +41,32 @@
     .container { display:flex; justify-content:center; gap:32px; align-items:flex-start; padding:10px 14px 24px; flex-wrap:wrap; }
     .column { display:flex; flex-direction:column; gap:10px; min-width:300px; max-width:560px; width:100%; }
 
-    .card { background:#fff; border:1px solid #eee; border-radius:10px; box-shadow: 0 8px 22px rgba(0,0,0,.04); padding:12px; }
-    .card h2 { margin:4px 0 10px; font-size:14px; color:#333; }
+    /* === sem retângulo de fundo atrás do texto === */
+    /* removidos cartões; apenas o textarea fica visível */
 
-    textarea { width:100%; min-height:380px; resize:vertical; padding:10px; border:1px solid #ddd; border-radius:6px; font-family:monospace; font-size:13px; line-height:1.5; color:#757575; background:#fff; transition: box-shadow .12s, border-color .12s; }
+    h2 { margin:4px 0 4px; font-size:14px; color:#333; font-weight:700; }
+
+    textarea { width:100%; height:380px; /* tamanho fixo */ resize:none; padding:10px; border:1px solid #ddd; border-radius:6px; font-family:monospace; font-size:13px; line-height:1.5; color:#757575; background:#fff; transition: box-shadow .12s, border-color .12s; }
     textarea:focus { outline:none; border-color: var(--azul-escuro); box-shadow:0 0 0 3px rgba(0, 123, 255, 0.12); }
 
-    .controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:8px; }
+    .controls { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:4px; }
     .controls label { display:flex; align-items:center; gap:6px; font-size:12px; user-select:none; }
 
-    .btn { border:none; cursor:pointer; padding:10px 12px; border-radius:6px; font-size:14px; }
-    .btn.primary { background:var(--azul); color:#fff; }
-    .btn.warn { background:var(--vermelho); color:#fff; }
+    /* ===== middle controls (como no exemplo) ===== */
+    #middle-controls { display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center; min-width:170px; }
+    #middle-controls button { width:170px; padding:10px 12px; font-size:14px; border-radius:6px; border:none; cursor:pointer; }
+    #btn-convert { background:var(--azul); color:#fff; }
+    #btn-reset { background:var(--vermelho); color:#fff; }
 
     #contador-linhas { text-align:center; margin: 12px 0 24px; font-weight:700; }
 
-    /* mac-links (rodapé) */
-    .mac-links { margin: 0 14px 30px; display:grid; grid-template-columns: repeat(4, 1fr); gap:10px; align-items:stretch; }
-    .mac-links a { display:block; padding:8px 10px; background:#f7fbff; border:1px solid #e6f0ff; color:var(--azul); text-decoration:none; border-radius:6px; text-align:center; font-family:monospace; }
-    .mac-links a:hover { background:#eef6ff; }
-
-    @media (max-width:900px) { .container{gap:20px; padding:10px;} .mac-links{grid-template-columns:repeat(2,1fr);} }
-    @media (max-width:520px) { .container{flex-direction:column; align-items:center;} .column{max-width:100%; min-width:auto; width:100%;} .mac-links{grid-template-columns:repeat(1,1fr);} }
+    @media (max-width:900px) { .container{gap:20px; padding:10px;} }
+    @media (max-width:520px) { .container{flex-direction:column; align-items:center;} .column{max-width:100%; min-width:auto; width:100%;} #middle-controls{flex-direction:row; gap:8px;} #middle-controls button{ width:120px; } }
 
     /* aviso / toast */
     #copy-notice { position:fixed; right:18px; bottom:18px; background:rgba(0,0,0,0.78); color:#fff; padding:8px 12px; border-radius:6px; display:none; z-index:2000; font-family:monospace; font-size:13px; }
 
-    @media print { header, .menu-dropdown-content, .controls, .mac-links, #copy-notice { display:none!important; } body, html { font-family:monospace; } .container { gap:0; padding:0; } .card { box-shadow:none; border:none; } }
+    @media print { header, .menu-dropdown-content, #middle-controls, #copy-notice { display:none!important; } body, html { font-family:monospace; } .container { gap:0; padding:0; } }
   </style>
 </head>
 <body>
@@ -132,45 +131,33 @@
   <!-- ===== área principal: conversor do BAT ===== -->
   <div class="container">
     <div class="column">
-      <div class="card">
-        <h2>Entrada (cole aqui as linhas do seu texto.txt)</h2>
-        <textarea id="entrada" placeholder="Cole aqui suas frases, uma por linha..."></textarea>
-        <div class="controls">
-          <label><input type="checkbox" id="opt-remover" checked> Remover palavras: pacote/pac/pact/pct</label>
-          <label><input type="checkbox" id="opt-mover" checked> Mover número do início para o fim</label>
-          <label><input type="checkbox" id="opt-ordenar" checked> Ordenar alfabeticamente (A→Z)</label>
-          <button class="btn primary" onclick="processar()">Converter →</button>
-          <button class="btn warn" onclick="resetarTudo()">Resetar Tudo</button>
-        </div>
+      <h2>Entrada (cole aqui as linhas do seu texto.txt)</h2>
+      <textarea id="entrada" placeholder="Cole aqui suas frases, uma por linha..."></textarea>
+      <div class="controls">
+        <label><input type="checkbox" id="opt-remover" checked> Remover palavras: pacote/pac/pact/pct</label>
+        <label><input type="checkbox" id="opt-mover" checked> Mover número do início para o fim</label>
+        <label><input type="checkbox" id="opt-ordenar" checked> Ordenar alfabeticamente (A→Z)</label>
       </div>
     </div>
 
+    <div id="middle-controls" aria-hidden="false">
+      <button id="btn-convert" title="Converter">→</button>
+      <button id="btn-reset" title="Resetar Tudo">Resetar Tudo</button>
+    </div>
+
     <div class="column">
-      <div class="card">
-        <h2>Resultado</h2>
-        <textarea id="resultado" readonly placeholder="O resultado aparecerá aqui..."></textarea>
-      </div>
+      <h2>Resultado</h2>
+      <textarea id="resultado" readonly placeholder="O resultado aparecerá aqui..."></textarea>
     </div>
   </div>
 
   <div id="contador-linhas">Linhas preenchidas: 0</div>
 
-  <div class="mac-links" role="navigation" aria-label="Outros MACs">
-    <a href="#" onclick="abrirMac(event,'MAC Bairro Planalto - Cód. 78')">MAC 78 - Bairro Planalto</a>
-    <a href="#" onclick="abrirMac(event,'MAC Romeu Duarte - Cód. 79')">MAC 79 - Romeu Duarte</a>
-    <a href="#" onclick="abrirMac(event,'MAC Rua São Geraldo / Centro 2 - Cód. 80')">MAC 80 - Rua São Geraldo / Centro 2</a>
-    <a href="#" onclick="abrirMac(event,'MAC Matriz - Cód. 277')">MAC 277 - Matriz</a>
-    <a href="#" onclick="abrirMac(event,'MAC Concesso - Cód. 853')">MAC 853 - Concesso</a>
-    <a href="#" onclick="abrirMac(event,'MAC Jardim do Lago - Cód. 1249')">MAC 1249 - Jardim do Lago</a>
-    <a href="#" onclick="abrirMac(event,'MAC Araújos - Cód. 989')">MAC 989 - Araújos</a>
-  </div>
-
   <!-- aviso discreto -->
   <div id="copy-notice">Copiado!</div>
 
   <script>
-    /* ========== util: toast ==========
-    */
+    /* ========== util: toast ========== */
     function showBottomNotice(message = 'Copiado!', duration = 2000) {
       const el = document.getElementById('copy-notice');
       if (!el) return;
@@ -237,7 +224,7 @@
       document.getElementById('contador-linhas').innerText = `Linhas preenchidas: ${count}`;
     }
 
-    // copia resultado (mantendo o id/nome usados no cabeçalho)
+    // copia resultado
     function copiarDireita() {
       const textoFinal = document.getElementById('resultado').value || '';
       if (!textoFinal.trim()) { showBottomNotice('Nada para copiar', 2000); return; }
@@ -276,7 +263,7 @@
       linhas.forEach(l=>{ doc.text(l, marginLeft, y, {maxWidth}); y+=14; if(y>doc.internal.pageSize.getHeight()-60){ doc.addPage(); doc.setFontSize(11); doc.setFont('courier','normal'); y=40; }}); y+=8; doc.text(`Linhas preenchidas: ${linhas.length}`, marginLeft, y);
       try{
         const newWin = window.open('', '_blank'); if(!newWin){ doc.save('resultado.pdf'); showBottomNotice('PDF baixado', 2000); if(btn) btn.disabled=false; return; }
-        const pdfBlob = doc.output('blob'); const url = URL.createObjectURL(pdfBlob); try { newWin.location.href = url; } catch(e){ try { newWin.document.open(); newWin.document.write(`<!doctype html><html><head><title>PDF - Resultado</title></head><body style="margin:0"><embed src="${url}" type="application/pdf" width="100%" height="100%"/></body></html>`); newWin.document.close(); } catch(err2){ doc.save('resultado.pdf'); showBottomNotice('PDF baixado', 2000); try{ newWin.close(); }catch(_){} } }
+        const pdfBlob = doc.output('blob'); const url = URL.createObjectURL(pdfBlob); try { newWin.location.href = url; } catch(e){ try { newWin.document.open(); newWin.document.write(`<!doctype html><html><head><title>PDF - Resultado</title></head><body style=\"margin:0\"><embed src=\"${url}\" type=\"application/pdf\" width=\"100%\" height=\"100%\"/></body></html>`); newWin.document.close(); } catch(err2){ doc.save('resultado.pdf'); showBottomNotice('PDF baixado', 2000); try{ newWin.close(); }catch(_){} } }
         setTimeout(()=>{ try{ URL.revokeObjectURL(url);}catch(_){ } }, 60000);
       } catch(err){ showBottomNotice('Erro ao gerar PDF', 3000); console.error(err); }
       finally { if(btn) btn.disabled=false; }
@@ -298,9 +285,13 @@
 
     /* ===== init ===== */
     document.addEventListener('DOMContentLoaded', ()=>{
-      // contador ao digitar
+      // listeners dos botões do meio
+      document.getElementById('btn-convert').addEventListener('click', processar);
+      document.getElementById('btn-reset').addEventListener('click', resetarTudo);
+
+      // contador inicial
       document.getElementById('resultado').addEventListener('input', atualizarContagem);
-      document.getElementById('entrada').addEventListener('input', ()=>{ /* opcional: preview live */ });
+
       // botão imprimir (listener único)
       const printBtn = document.getElementById('btn-print'); if(printBtn){ try{ printBtn.onclick=null; }catch(_){} printBtn.addEventListener('click', (ev)=>{ ev.preventDefault(); if(printBtn.disabled) return; imprimirDireto(); }); }
       atualizarContagem();
